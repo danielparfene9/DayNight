@@ -1,12 +1,13 @@
 import pygame
 import random
+import math
 
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 GRID_SIZE = 40
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+BLACK = (131, 135, 141)
 GRAY = (200, 200, 200)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -20,16 +21,15 @@ for y in range(len(grid)):
     for x in range(len(grid[0]) // 2):
         grid[y][x] = WHITE
 
-
 for y in range(len(grid)):
     for x in range(len(grid[0]) // 2, len(grid[0])):
         grid[y][x] = BLACK
 
-ball_radius = 10
+ball_radius = 12
 ball_white = pygame.Rect(WIDTH // 4, HEIGHT // 2, ball_radius * 2, ball_radius * 2)
 ball_black = pygame.Rect(3 * WIDTH // 4, HEIGHT // 2, ball_radius * 2, ball_radius * 2)
-ball_white_speed = [random.choice([-5, 5]), random.choice([-5, 5])]
-ball_black_speed = [random.choice([-5, 5]), random.choice([-5, 5])]
+ball_white_speed = [random.choice([-10, 10]), random.choice([-10, 10])]
+ball_black_speed = [random.choice([-10, 10]), random.choice([-10, 10])]
 
 running = True
 while running:
@@ -41,19 +41,35 @@ while running:
     ball_black = ball_black.move(ball_black_speed)
 
 
-    white_grid_x = ball_white.centerx // GRID_SIZE
-    white_grid_y = ball_white.centery // GRID_SIZE
+    if math.sqrt(ball_white_speed[0] ** 2 + ball_white_speed[1] ** 2) == 0:
+        ball_white_speed = [random.choice([-10, 10]), random.choice([-10, 10])]
+
+
+    if math.sqrt(ball_black_speed[0] ** 2 + ball_black_speed[1] ** 2) == 0:
+        ball_black_speed = [random.choice([-10, 10]), random.choice([-10, 10])]
+
+
+    white_grid_x = min(max(ball_white.centerx // GRID_SIZE, 0), len(grid[0]) - 1)
+    white_grid_y = min(max(ball_white.centery // GRID_SIZE, 0), len(grid) - 1)
     if grid[white_grid_y][white_grid_x] == BLACK:
-        ball_white_speed[0] *= -1
-        ball_white_speed[1] *= -1
+        dx = ball_white.centerx - white_grid_x * GRID_SIZE - GRID_SIZE / 2
+        dy = ball_white.centery - white_grid_y * GRID_SIZE - GRID_SIZE / 2
+        angle = math.atan2(dy, dx)
+        speed = math.sqrt(ball_white_speed[0] ** 2 + ball_white_speed[1] ** 2)
+        ball_white_speed[0] = speed * math.cos(2 * angle) * -1
+        ball_white_speed[1] = speed * math.sin(2 * angle) * -1
         grid[white_grid_y][white_grid_x] = WHITE
 
 
-    black_grid_x = ball_black.centerx // GRID_SIZE
-    black_grid_y = ball_black.centery // GRID_SIZE
+    black_grid_x = min(max(ball_black.centerx // GRID_SIZE, 0), len(grid[0]) - 1)
+    black_grid_y = min(max(ball_black.centery // GRID_SIZE, 0), len(grid) - 1)
     if grid[black_grid_y][black_grid_x] == WHITE:
-        ball_black_speed[0] *= -1
-        ball_black_speed[1] *= -1
+        dx = ball_black.centerx - black_grid_x * GRID_SIZE - GRID_SIZE / 2
+        dy = ball_black.centery - black_grid_y * GRID_SIZE - GRID_SIZE / 2
+        angle = math.atan2(dy, dx)
+        speed = math.sqrt(ball_black_speed[0] ** 2 + ball_black_speed[1] ** 2)
+        ball_black_speed[0] = speed * math.cos(2 * angle) * -1
+        ball_black_speed[1] = speed * math.sin(2 * angle) * -1
         grid[black_grid_y][black_grid_x] = BLACK
 
 
@@ -75,11 +91,12 @@ while running:
     pygame.draw.circle(screen, WHITE, ball_black.center, ball_radius)
 
     font = pygame.font.SysFont(None, 30)
-    text = font.render(f"Day: {sum(row.count(WHITE) for row in grid)} | Night: {sum(row.count(BLACK) for row in grid)}", True, (0, 0, 0))
+    text = font.render(f"Day: {sum(row.count(WHITE) for row in grid)} | Night: {sum(row.count(BLACK) for row in grid)}",
+                       True, (0, 0, 0))
     screen.blit(text, (10, 10))
 
     pygame.display.flip()
 
-    pygame.time.Clock().tick(60)
+    pygame.time.Clock().tick(144)
 
 pygame.quit()
