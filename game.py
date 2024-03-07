@@ -40,6 +40,23 @@ while running:
     ball_white = ball_white.move(ball_white_speed)
     ball_black = ball_black.move(ball_black_speed)
 
+
+    white_grid_x = ball_white.centerx // GRID_SIZE
+    white_grid_y = ball_white.centery // GRID_SIZE
+    if grid[white_grid_y][white_grid_x] == BLACK:
+        ball_white_speed[0] *= -1
+        ball_white_speed[1] *= -1
+        grid[white_grid_y][white_grid_x] = WHITE
+
+
+    black_grid_x = ball_black.centerx // GRID_SIZE
+    black_grid_y = ball_black.centery // GRID_SIZE
+    if grid[black_grid_y][black_grid_x] == WHITE:
+        ball_black_speed[0] *= -1
+        ball_black_speed[1] *= -1
+        grid[black_grid_y][black_grid_x] = BLACK
+
+
     if ball_white.left < 0 or ball_white.right > WIDTH:
         ball_white_speed[0] *= -1
     if ball_white.top < 0 or ball_white.bottom > HEIGHT:
@@ -49,16 +66,6 @@ while running:
         ball_black_speed[0] *= -1
     if ball_black.top < 0 or ball_black.bottom > HEIGHT:
         ball_black_speed[1] *= -1
-
-    white_grid_x = ball_white.centerx // GRID_SIZE
-    white_grid_y = ball_white.centery // GRID_SIZE
-    if grid[white_grid_y][white_grid_x] != WHITE:
-        grid[white_grid_y][white_grid_x] = WHITE
-
-    black_grid_x = ball_black.centerx // GRID_SIZE
-    black_grid_y = ball_black.centery // GRID_SIZE
-    if grid[black_grid_y][black_grid_x] != BLACK:
-        grid[black_grid_y][black_grid_x] = BLACK
 
     screen.fill(GRAY)
     for y, row in enumerate(grid):
