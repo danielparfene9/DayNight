@@ -1,7 +1,6 @@
 import pygame
 import random
 
-
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
@@ -13,7 +12,18 @@ GRAY = (200, 200, 200)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Color Bounce Game")
 
+
 grid = [[GRAY for _ in range(WIDTH // GRID_SIZE)] for _ in range(HEIGHT // GRID_SIZE)]
+
+
+for y in range(len(grid)):
+    for x in range(len(grid[0]) // 2):
+        grid[y][x] = WHITE
+
+
+for y in range(len(grid)):
+    for x in range(len(grid[0]) // 2, len(grid[0])):
+        grid[y][x] = BLACK
 
 ball_radius = 10
 ball_white = pygame.Rect(WIDTH // 4, HEIGHT // 2, ball_radius * 2, ball_radius * 2)
@@ -45,16 +55,10 @@ while running:
     if grid[white_grid_y][white_grid_x] != WHITE:
         grid[white_grid_y][white_grid_x] = WHITE
 
-        white_count = sum(row.count(WHITE) for row in grid)
-        black_count = sum(row.count(BLACK) for row in grid)
-
     black_grid_x = ball_black.centerx // GRID_SIZE
     black_grid_y = ball_black.centery // GRID_SIZE
     if grid[black_grid_y][black_grid_x] != BLACK:
         grid[black_grid_y][black_grid_x] = BLACK
-
-        white_count = sum(row.count(WHITE) for row in grid)
-        black_count = sum(row.count(BLACK) for row in grid)
 
     screen.fill(GRAY)
     for y, row in enumerate(grid):
@@ -62,9 +66,9 @@ while running:
             pygame.draw.rect(screen, color, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE))
     pygame.draw.circle(screen, BLACK, ball_white.center, ball_radius)
     pygame.draw.circle(screen, WHITE, ball_black.center, ball_radius)
-    # Display count
+
     font = pygame.font.SysFont(None, 30)
-    text = font.render(f"Day: {white_count} | Night: {black_count}", True, (0, 0, 0))
+    text = font.render(f"Day: {sum(row.count(WHITE) for row in grid)} | Night: {sum(row.count(BLACK) for row in grid)}", True, (0, 0, 0))
     screen.blit(text, (10, 10))
 
     pygame.display.flip()
